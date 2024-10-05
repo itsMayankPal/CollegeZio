@@ -1,10 +1,8 @@
-// Header.jsx
-
 import React from "react";
+import logo from "../Assets/images/logo.png";
 import {
   AppBar,
   Toolbar,
-  Typography,
   Button,
   IconButton,
   Drawer,
@@ -50,14 +48,24 @@ export default function Header() {
           boxShadow: "none", // For cleaner look
         }}
       >
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, fontWeight: "bold" }}
-          >
-            CollegeZio
-          </Typography>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div className="logo">
+            <Link to="/">
+              {" "}
+              {/* Wrap the logo with Link to navigate to home */}
+              <img
+                src={logo}
+                alt="CollegeZio Logo"
+                style={{ height: isMobile ? "40px" : "60px", width: "auto" }} // Responsive logo size
+              />
+            </Link>
+          </div>
 
           {isMobile ? (
             <>
@@ -66,6 +74,7 @@ export default function Header() {
                 color="inherit"
                 aria-label="menu"
                 onClick={handleDrawerToggle}
+                sx={{ marginLeft: "20px" }} // Added margin to the left of the menu icon
               >
                 <MenuIcon />
               </IconButton>
@@ -97,9 +106,10 @@ export default function Header() {
                   component={Link}
                   to={item.path}
                   sx={{
-                    color: "#F4B400", // Golden/yellow for enthusiasm and contrast
+                    color: "#FFD700", // Golden/yellow for enthusiasm and contrast
                     fontWeight: "bold",
                     marginLeft: "1rem",
+                    fontSize: { xs: "0.875rem", md: "1rem" }, // Responsive font size
                     "&:hover": {
                       backgroundColor: "#008080", // Teal for balance and refreshing feel
                       color: "white",

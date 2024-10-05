@@ -1,0 +1,28 @@
+footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    background-color: #00539C; /* Deep Blue */
+    color: white;
+  }
+  
+  footer a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  footer a:hover {
+    color: #F4B400; /* Warm Golden Yellow */
+  }
+  
+  footer ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  footer ul li {
+    display: inline;
+    margin: 0 15px;
+  }
+  
