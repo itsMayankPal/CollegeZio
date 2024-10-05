@@ -22,7 +22,7 @@ Installation
 Clone the Repository:
 bash
 Copy code
-git clone https://github.com/yourusername/collegezio.git
+git clone https://github.com/itsMayankPal/CollegeZio.git
 cd collegezio
 Setup the Server:
 Navigate to the server directory and install the dependencies:
