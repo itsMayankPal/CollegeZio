@@ -63,7 +63,7 @@ export default function Footer() {
                   alignItems: "center", // Centered items
                 }}
               >
-                {["Home", "About", "Contact", "Courses", "Privacy Policy"].map(
+                {["Home", "About", "Contact", "Courses", "Privacy"].map(
                   (text) => (
                     <li key={text} style={{ margin: "10px 0" }}>
                       <Link

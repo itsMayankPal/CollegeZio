@@ -2,8 +2,10 @@ import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
+// Layout and Pages imports
 import Layout from "./Layout.jsx";
 import Home from "./Pages/Home";
+import Privacy from "./Pages/Privacy";
 import About from "./Pages/About";
 import Contact from "./Pages/Contact";
 import Courses from "./Pages/Courses";
@@ -13,26 +15,40 @@ import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import Reviews from "./Pages/Reviews";
 import Profile from "./Pages/Profile";
+import NotFound from "./Components/NotFound.jsx";
+import PrivateRoute from "./Services/PrivateRoute"; // Import PrivateRoute
 
+// Define a Material-UI theme
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#00539C",
+      main: "#00539C", // Main primary color
     },
     secondary: {
-      main: "#F4B400",
+      main: "#F4B400", // Main secondary color
     },
   },
   typography: {
     h6: {
-      fontWeight: 700,
+      fontWeight: 700, // Bold h6 typography
     },
     button: {
-      textTransform: "none",
+      textTransform: "none", // No uppercase transformation for buttons
+      fontWeight: 600, // Bold button text
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: "12px", // Rounded corners for buttons
+        },
+      },
     },
   },
 });
 
+// Define the routes for the application
 const router = createBrowserRouter([
   {
     path: "/",
@@ -43,12 +59,14 @@ const router = createBrowserRouter([
       { path: "about", element: <About /> },
       { path: "contact", element: <Contact /> },
       { path: "courses", element: <Courses /> },
-      { path: "dashboard", element: <Dashboard /> },
+      { path: "dashboard", element: <PrivateRoute element={<Dashboard />} /> }, // Protected route
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "reviews", element: <Reviews /> },
       { path: "mock-test", element: <MockTest /> },
-      { path: "profile", element: <Profile /> },
+      { path: "profile", element: <PrivateRoute element={<Profile />} /> }, // Protected route
+      { path: "privacy", element: <Privacy /> },
+      { path: "*", element: <NotFound /> }, // Fallback for 404
     ],
   },
 ]);

@@ -43,9 +43,9 @@ export default function Header() {
       <AppBar
         position="static"
         sx={{
-          backgroundColor: "#00539C", // Deep blue for trust and professionalism
+          backgroundColor: "#00539C",
           padding: "0.5rem",
-          boxShadow: "none", // For cleaner look
+          boxShadow: "none",
         }}
       >
         <Toolbar
@@ -62,7 +62,7 @@ export default function Header() {
               <img
                 src={logo}
                 alt="CollegeZio Logo"
-                style={{ height: isMobile ? "40px" : "60px", width: "auto" }} // Responsive logo size
+                style={{ height: isMobile ? "40px" : "60px", width: "auto" }}
               />
             </Link>
           </div>
@@ -74,7 +74,7 @@ export default function Header() {
                 color="inherit"
                 aria-label="menu"
                 onClick={handleDrawerToggle}
-                sx={{ marginLeft: "20px" }} // Added margin to the left of the menu icon
+                sx={{ marginLeft: "20px" }}
               >
                 <MenuIcon />
               </IconButton>
@@ -106,12 +106,12 @@ export default function Header() {
                   component={Link}
                   to={item.path}
                   sx={{
-                    color: "#FFD700", // Golden/yellow for enthusiasm and contrast
+                    color: "#FFD700",
                     fontWeight: "bold",
                     marginLeft: "1rem",
-                    fontSize: { xs: "0.875rem", md: "1rem" }, // Responsive font size
+                    fontSize: { xs: "0.875rem", md: "1rem" },
                     "&:hover": {
-                      backgroundColor: "#008080", // Teal for balance and refreshing feel
+                      backgroundColor: "#008080",
                       color: "white",
                     },
                   }}
