@@ -2,9 +2,10 @@ const express = require("express");
 const Resource = require("../models/ResourceSchema");
 const authMiddleware = require("../middleware/authMiddleware"); // Import authMiddleware
 const router = express.Router();
+const User = require("../models/UserSchema");
 
 // Create a new resource
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/add", authMiddleware, async (req, res) => {
   const { type, title, link, description, academicYear, course } = req.body;
 
   // Validate that all required fields are provided
@@ -80,6 +81,60 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     }
 
     res.json({ message: "Resource deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.post("/save", authMiddleware, async (req, res) => {
+  const { resource } = req.body; // No need for userId in the request body
+  const resourceId = resource._id;
+
+  // Validate the resource input
+  if (!resource || !resourceId) {
+    return res.status(400).json({ message: "Invalid resource data" });
+  }
+
+  try {
+    // Use req.user.id from authMiddleware
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the resource is already saved to avoid duplicates
+    // const alreadySaved = user.savedResources.some(
+    //   (savedResource) => savedResource.toString() === resourceId
+    // );
+
+    // if (alreadySaved) {
+    //   return res.status(400).json({ message: "Resource already saved" });
+    // }
+
+    // Add the resource to savedResources
+    user.savedResources.push(resourceId);
+
+    // Save the user with the updated savedResources
+    await user.save();
+
+    res.status(200).json({ message: "Resource saved successfully!" });
+  } catch (error) {
+    res.status(500).json({ message: "Error saving resource", error });
+  }
+});
+
+router.get("/saved", authMiddleware, async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query; // Default to 10 items per page
+    const user = await User.findById(req.user.id).populate({
+      path: "savedResources",
+      options: {
+        limit: parseInt(limit), // Convert to number
+        skip: (page - 1) * limit,
+      },
+    });
+    res.json(user.savedResources);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

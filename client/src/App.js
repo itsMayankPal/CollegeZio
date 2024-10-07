@@ -13,10 +13,10 @@ import Dashboard from "./Pages/Dashboard";
 import MockTest from "./Pages/MockTest";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
-import Reviews from "./Pages/Reviews";
 import Profile from "./Pages/Profile";
 import NotFound from "./Components/NotFound.jsx";
 import PrivateRoute from "./Services/PrivateRoute"; // Import PrivateRoute
+import Resources from "./Pages/Resources";
 
 // Define a Material-UI theme
 const theme = createTheme({
@@ -62,7 +62,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <PrivateRoute element={<Dashboard />} /> }, // Protected route
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
-      { path: "reviews", element: <Reviews /> },
+      { path: "resources", element: <Resources /> },
       { path: "mock-test", element: <MockTest /> },
       { path: "profile", element: <PrivateRoute element={<Profile />} /> }, // Protected route
       { path: "privacy", element: <Privacy /> },

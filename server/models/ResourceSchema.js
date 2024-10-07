@@ -1,4 +1,3 @@
-// models/Resource.js
 const mongoose = require("mongoose");
 
 const ResourceSchema = new mongoose.Schema(
@@ -12,7 +11,10 @@ const ResourceSchema = new mongoose.Schema(
     link: { type: String, required: true },
     description: { type: String },
     academicYear: { type: String, required: true }, // e.g., "2024-2025"
-    course: { type: String, required: true }, // Related course
+    course: {
+      type: [String], // Changed to an array of strings to allow multiple courses
+      required: true,
+    },
     addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   {

@@ -33,7 +33,7 @@ export default function Header() {
     { text: "Dashboard", path: "/dashboard" },
     { text: "Mock Test", path: "/mock-test" },
     { text: "Profile", path: "/profile" },
-    { text: "Review", path: "/reviews" },
+    { text: "Resources", path: "/resources" },
     { text: "Login", path: "/login" },
     { text: "Register", path: "/register" },
   ];

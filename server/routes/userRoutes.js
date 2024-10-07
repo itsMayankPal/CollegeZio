@@ -78,6 +78,36 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.put("/update", authMiddleware, async (req, res) => {
+  const { username, email, password, courseName, universityName } = req.body;
+  const updates = {};
+
+  if (username) updates.username = username;
+  if (email) updates.email = email;
+  if (courseName) updates.courseName = courseName;
+  if (universityName) updates.universityName = universityName;
+
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    updates.password = await bcrypt.hash(password, salt);
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // Get user details
 router.get("/me", authMiddleware, async (req, res) => {
   try {

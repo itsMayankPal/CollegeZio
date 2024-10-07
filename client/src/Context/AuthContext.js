@@ -1,4 +1,3 @@
-// src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import AuthService from "../Services/AuthService";
 
@@ -10,8 +9,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData) => {
     const response = await AuthService.login(userData);
-    setUser(response.user); // Store user data
-    localStorage.setItem("token", response.token); // Store token
+    setUser(response.user);
+    localStorage.setItem("token", response.token);
+  };
+
+  const register = async (userData) => {
+    await AuthService.register(userData);
   };
 
   const logout = () => {
@@ -19,21 +22,22 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
-  const getUser = async () => {
+  const fetchUserData = async () => {
     const token = localStorage.getItem("token");
     if (token) {
-      const userData = await AuthService.getUserData(token); // Fetch user data
+      const userData = await AuthService.getUserData(token);
+      console.log(userData);
       setUser(userData);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    getUser(); // Check for user data on mount
+    fetchUserData();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

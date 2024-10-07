@@ -2,8 +2,7 @@
 import axios from "axios";
 
 // Optionally, use an environment variable for the API URL
-const API_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:3002/api/users/";
+const API_URL = "http://localhost:3002/api/users/";
 
 const register = async (userData) => {
   try {

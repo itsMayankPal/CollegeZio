@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../Services/AuthService";
 import DashboardContent from "../Components/Dashboard"; // Import the Dashboard component from Components folder
+import { AuthProvider } from "../Context/AuthContext";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
@@ -10,10 +11,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log(token);
+    // console.log(token);
 
     if (!token) {
-      navigate("/login"); // Redirect to login if no token
+      navigate("/register"); // Redirect to login if no token
       return;
     }
 
@@ -34,7 +35,14 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Dashboard</h1>
-      {userData ? <DashboardContent userData={userData} /> : <p>Loading...</p>}
+      <AuthProvider>
+        {" "}
+        {userData ? (
+          <DashboardContent userData={userData} />
+        ) : (
+          <p>Loading...</p>
+        )}
+      </AuthProvider>
     </div>
   );
 };

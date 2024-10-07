@@ -17,7 +17,7 @@ const Login = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token"); // Check for token
-    console.log(token);
+    // console.log(token);
     if (token) {
       navigate("/dashboard"); // Redirect to dashboard if logged in
     }
