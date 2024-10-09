@@ -17,14 +17,11 @@ import {
 } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-// import { useAuth } from "../Context/AuthContext";
+import { useAuth } from "../Context/AuthContext"; // Uncomment and use this
 
 export default function SavedResources() {
   const [openDialog, setOpenDialog] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [currentResource, setCurrentResource] = useState({
-    id: null,
     title: "",
     description: "",
     type: "",
@@ -34,12 +31,10 @@ export default function SavedResources() {
   });
 
   const [resources, setResources] = useState([]);
-  const [userData, setUserData] = useState(null);
-  // const { userData } = useAuth();
+  const { user } = useAuth(); // Getting user data from context
 
   useEffect(() => {
     const fetchResources = async () => {
-      console.log("====TOKEN SENT===", localStorage.getItem("token"));
       const response = await fetch(
         "http://localhost:3002/api/resources/saved",
         {
@@ -50,38 +45,17 @@ export default function SavedResources() {
           },
         }
       );
+      if (!response.ok) {
+        throw new Error("Failed to fetch resources");
+      }
       const data = await response.json();
       setResources(data);
     };
     fetchResources();
   }, []);
 
-  useEffect(() => {
-    if (userData) {
-      console.log("User ID:", userData.id);
-    }
-  }, [userData]);
-
-  const handleOpenDialog = (
-    resource = {
-      id: null,
-      title: "",
-      description: "",
-      type: "",
-      link: "",
-      academicYear: "",
-      course: [],
-    }
-  ) => {
-    setCurrentResource(resource);
-    setIsEditMode(!!resource.id);
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  const handleOpenDialog = () => {
     setCurrentResource({
-      id: null,
       title: "",
       description: "",
       type: "",
@@ -89,50 +63,52 @@ export default function SavedResources() {
       academicYear: "",
       course: [],
     });
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   const handleSave = async () => {
-    console.log(userData);
-    if (!userData.id) {
+    if (!user._id) {
       alert("You need to log in to save resources.");
       return;
     }
-
+    console.log("Handle save is running");
     const userConfirmed = window.confirm(
       "Are you sure you want to save this resource?"
     );
     if (userConfirmed) {
       try {
-        const method = isEditMode ? "PUT" : "POST";
-        const endpoint = isEditMode
-          ? `http://localhost:3002/api/resources/update/${currentResource.id}`
-          : "http://localhost:3002/api/resources/save";
-
-        const response = await fetch(endpoint, {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userData.id,
-            resource: currentResource,
-          }),
-        });
+        console.log("User Confirmed to Add Resource");
+        const response = await fetch(
+          "http://localhost:3002/api/resources/add",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+              type: currentResource.type,
+              title: currentResource.title,
+              link: currentResource.link,
+              description: currentResource.description,
+              academicYear: currentResource.academicYear,
+              course: currentResource.course,
+            }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to save resource");
         }
 
         const data = await response.json();
-        alert(data.message);
+        alert(data);
+        setResources((prev) => [...prev, data]); // Add the new resource to state
         setOpenDialog(false);
-        setResources((prev) =>
-          isEditMode
-            ? prev.map((res) =>
-                res.id === currentResource.id ? currentResource : res
-              )
-            : [...prev, data.savedResource]
-        );
       } catch (error) {
         console.error(error);
         alert("Error saving resource: " + error.message);
@@ -140,11 +116,29 @@ export default function SavedResources() {
     }
   };
 
-  const handleDelete = async (id) => {
-    await fetch(`http://localhost:3002/resources/${id}`, {
-      method: "DELETE",
-    });
-    setResources((prev) => prev.filter((resource) => resource._id !== id));
+  const handleDelete = async (resourceId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3002/api/resources/saved/${resourceId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+      if (response.ok) {
+        setResources((prev) => prev.filter((res) => res._id !== resourceId));
+        console.log(result.message);
+        alert(result.message); // Feedback on successful deletion
+      } else {
+        alert("Error deleting resource: " + result.message);
+      }
+    } catch (error) {
+      alert("Error deleting resource: " + error.message);
+    }
   };
 
   return (
@@ -170,21 +164,6 @@ export default function SavedResources() {
                       primary={resource.title}
                       secondary={resource.description}
                     />
-                    <a
-                      href={resource?.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <a
-                        href={resource?.link || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <button className="view-button">View</button>
-                      </a>
-
-                      {/* hello */}
-                    </a>
                     <Button
                       size="small"
                       color="secondary"
@@ -204,19 +183,13 @@ export default function SavedResources() {
       </Grid>
 
       <Grid item xs={12}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpenDialog()}
-        >
+        <Button variant="contained" color="primary" onClick={handleOpenDialog}>
           Add New Resource
         </Button>
       </Grid>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>
-          {isEditMode ? "Edit Resource" : "Add New Resource"}
-        </DialogTitle>
+        <DialogTitle>Add New Resource</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -261,7 +234,7 @@ export default function SavedResources() {
           <TextField
             margin="dense"
             label="Link"
-            type="url"
+            type="text"
             fullWidth
             variant="outlined"
             value={currentResource.link}
@@ -292,11 +265,13 @@ export default function SavedResources() {
             type="text"
             fullWidth
             variant="outlined"
-            value={currentResource.course.join(", ")}
+            value={currentResource.course.join(", ")} // Assuming it's an array of strings
             onChange={(e) =>
               setCurrentResource({
                 ...currentResource,
-                course: e.target.value.split(",").map((item) => item.trim()),
+                course: e.target.value
+                  .split(",")
+                  .map((course) => course.trim()), // Convert back to array
               })
             }
           />
@@ -306,7 +281,7 @@ export default function SavedResources() {
             Cancel
           </Button>
           <Button onClick={handleSave} color="primary">
-            {isEditMode ? "Update" : "Save"}
+            Save
           </Button>
         </DialogActions>
       </Dialog>

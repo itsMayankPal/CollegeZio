@@ -39,8 +39,12 @@ const Register = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // Check for token
-    if (token) {
+    const token = localStorage.getItem("token");
+
+    // Check if the token exists and is valid
+    if (!token || token === "undefined") {
+      localStorage.removeItem("token"); // Remove invalid token
+    } else {
       navigate("/dashboard"); // Redirect to dashboard if logged in
     }
   }, [navigate]);
@@ -52,9 +56,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Clear any existing token
+      localStorage.removeItem("token");
+
       const response = await AuthService.register(formData);
       alert("Registration Successful!");
-      localStorage.setItem("token", response.token); // Store the token
+      localStorage.setItem("token", response.token); // Store the new token
       navigate("/dashboard"); // Redirect to dashboard after successful registration
     } catch (error) {
       alert(error.response.data.message);

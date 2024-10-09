@@ -16,9 +16,12 @@ const Login = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // Check for token
-    // console.log(token);
-    if (token) {
+    const token = localStorage.getItem("token");
+
+    // Check if the token exists and is valid
+    if (!token || token === "undefined") {
+      localStorage.removeItem("token"); // Remove invalid token
+    } else {
       navigate("/dashboard"); // Redirect to dashboard if logged in
     }
   }, [navigate]);
@@ -30,11 +33,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Clear any existing token
+      // localStorage.removeItem("token");
+
       const response = await AuthService.login(formData);
       alert("Login Successful!");
       console.log("Token stored:", response.token);
       console.log("Login response:", response);
-      localStorage.setItem("token", response.token); // Store the token
+
+      // Store the new token in localStorage
+      localStorage.setItem("token", response.token);
       navigate("/dashboard"); // Redirect to dashboard after successful login
     } catch (error) {
       alert(error.response.data.message);

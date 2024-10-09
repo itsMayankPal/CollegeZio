@@ -10,11 +10,12 @@ const ResourceSchema = new mongoose.Schema(
     title: { type: String, required: true },
     link: { type: String, required: true },
     description: { type: String },
-    academicYear: { type: String, required: true }, // e.g., "2024-2025"
+    university: { type: String }, // New field for university
     course: {
-      type: [String], // Changed to an array of strings to allow multiple courses
-      required: true,
+      type: [String], // Array of strings for multiple courses
     },
+    semester: { type: Number }, // New field for semester
+    subject: { type: String }, // New field for subject
     addedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   {

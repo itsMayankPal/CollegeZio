@@ -3,7 +3,7 @@ import React from "react";
 // import SearchBar from "../Components/SearchBar";
 import FilterSection from "../Components/FilterSection";
 import ResourcesCards from "../Components/ResourcesCard";
-import SavedResources from "../Components/SavedResources";
+// import SavedResources from "../Components/SavedResources";
 import UploadResources from "../Components/UploadResources";
 
 // import HeaderBar from "../Components/HeaderBar";
@@ -15,7 +15,7 @@ export default function Resources() {
       {/* <SearchBar /> */}
       <FilterSection />
       <ResourcesCards />
-      <SavedResources />
+      {/* <SavedResources /> */}
       <UploadResources />
       {/* <FooterBar /> */}
     </div>

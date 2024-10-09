@@ -22,19 +22,23 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
   };
 
-  const fetchUserData = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const userData = await AuthService.getUserData(token);
-      console.log(userData);
-      setUser(userData);
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const userData = await AuthService.getUserData(token);
+          setUser(userData);
+        } catch (error) {
+          console.error("Failed to fetch user data:", error.message);
+          logout();
+        }
+      }
+      setLoading(false);
+    };
+
     fetchUserData();
-  }, []);
+  }, []); // Now there's no warning
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>

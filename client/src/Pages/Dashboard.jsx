@@ -11,7 +11,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // console.log(token);
 
     if (!token) {
       navigate("/register"); // Redirect to login if no token
