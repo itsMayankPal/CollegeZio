@@ -1,26 +1,30 @@
 import React, { useState } from "react";
 import {
-  Drawer,
+  AppBar,
   Toolbar,
   Button,
   Grid,
   Card,
   CardContent,
   Typography,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Drawer,
+  IconButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ResourcesIcon from "@mui/icons-material/LibraryBooks";
 import NotesIcon from "@mui/icons-material/Description";
 import CommunityIcon from "@mui/icons-material/Forum";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import SavedResources from "./SavedResources";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useSelector } from "react-redux";
-
-// Import the Settings component
+import SavedResources from "./SavedResources";
 import Settings from "./Setting";
+import MainContent from "./DashboardContent/MainContent";
 
-// Sample items for navigation (this can be dynamic)
 const navItems = [
   { label: "Home", icon: <MenuIcon /> },
   { label: "Saved Resources", icon: <ResourcesIcon /> },
@@ -35,22 +39,15 @@ const DashboardContent = ({ userData }) => {
     (state) => state.resourceState.savedResourcesList
   );
   const [activeComponent, setActiveComponent] = useState("Home");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Define the content for each section
   const renderContent = () => {
     switch (activeComponent) {
       case "Saved Resources":
         return (
-          <Grid item xs={12} md={12} lg={12}>
-            {" "}
-            {/* Updated Grid layout to full width */}
-            <Card sx={{ height: "100%", width: "100%" }}>
-              {" "}
-              {/* Ensure full width for the Card */}
+          <Grid item xs={12}>
+            <Card sx={{ height: "100%" }}>
               <CardContent>
-                {/* <Typography variant="h6" gutterBottom>
-                  Saved Resources
-                </Typography> */}
                 <SavedResources savedResources={savedResources} />
               </CardContent>
             </Card>
@@ -59,7 +56,7 @@ const DashboardContent = ({ userData }) => {
 
       case "Study Materials":
         return (
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -70,7 +67,7 @@ const DashboardContent = ({ userData }) => {
                 </Typography>
                 <Button
                   variant="contained"
-                  color="secondary"
+                  color="primary"
                   sx={{ marginTop: "16px" }}
                 >
                   View Study Materials
@@ -79,9 +76,10 @@ const DashboardContent = ({ userData }) => {
             </Card>
           </Grid>
         );
+
       case "Community":
         return (
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -101,39 +99,36 @@ const DashboardContent = ({ userData }) => {
             </Card>
           </Grid>
         );
+
       case "Notifications":
         return (
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid item xs={12} md={6}>
             <Card sx={{ height: "100%" }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Notifications
+                  Notificationssssss
                 </Typography>
                 <Typography variant="body2">
                   Check for new updates and alerts.
                 </Typography>
-                <ul>
-                  <li>New blog post available</li>
-                  <li>System maintenance on 12th Oct</li>
-                </ul>
+                <List>
+                  <ListItem>
+                    <ListItemText primary="New blog post available" />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="System maintenance on 12th Oct" />
+                  </ListItem>
+                </List>
               </CardContent>
             </Card>
           </Grid>
         );
+
       case "Settings":
         return <Settings userData={userData} />;
+
       default:
-        return (
-          <Grid item xs={12} md={6} lg={4}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Welcome to the Dashboard!
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        );
+        return <MainContent userData={userData} />;
     }
   };
 
@@ -141,37 +136,59 @@ const DashboardContent = ({ userData }) => {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Sidebar Navigation */}
       <Drawer
-        variant="permanent"
-        sx={{
-          width: 240,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": { width: 240, boxSizing: "border-box" },
-        }}
+        variant="temporary"
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
       >
-        <Toolbar />
-        <div>
-          {navItems.map((item) => (
-            <Button
-              key={item.label}
-              startIcon={item.icon}
-              fullWidth
-              sx={{ justifyContent: "flex-start", padding: "12px" }}
-              onClick={() => setActiveComponent(item.label)}
-            >
-              {item.label}
-            </Button>
-          ))}
+        <div style={{ width: 250 }}>
+          <List>
+            {navItems.map((item) => (
+              <ListItem
+                button
+                key={item.label}
+                onClick={() => {
+                  setActiveComponent(item.label);
+                  setDrawerOpen(false); // Close drawer on item click
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItem>
+            ))}
+          </List>
         </div>
       </Drawer>
 
       {/* Main Content Area */}
-      <div style={{ flexGrow: 1, padding: "24px", marginTop: "64px" }}>
-        {" "}
-        {/* Adjust marginTop to prevent overlapping */}
+      <div style={{ flexGrow: 1 }}>
+        <AppBar position="static" sx={{ backgroundColor: "#2196f3" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              onClick={() => setDrawerOpen(true)}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" color="inherit">
+              Dashboard
+            </Typography>
+          </Toolbar>
+        </AppBar>
+
         {/* Rendered Content */}
-        <Grid container spacing={3}>
-          {renderContent()}
-        </Grid>
+        <div
+          style={{
+            padding: "24px",
+            backgroundColor: "#f4f6f8", // Light background for better contrast
+          }}
+        >
+          <Grid container spacing={3}>
+            {renderContent()}
+          </Grid>
+        </div>
       </div>
     </div>
   );

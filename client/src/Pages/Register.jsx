@@ -52,13 +52,11 @@ const Register = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  console.log("Form Data: ", formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Clear any existing token
-      localStorage.removeItem("token");
-
       const response = await AuthService.register(formData);
       alert("Registration Successful!");
       localStorage.setItem("token", response.token); // Store the new token

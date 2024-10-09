@@ -20,7 +20,7 @@ export default function ResourcesCards() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false); // State for dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleSave = async (resource) => {
     if (!userData || !userData._id) {
@@ -66,9 +66,8 @@ export default function ResourcesCards() {
       return;
     }
 
-    // Check if the user is the owner of the resource
-    if (resource.addedBy !== userData._id) {
-      setDialogOpen(true); // Open the dialog if the user cannot delete
+    if (resource.addedBy._id !== userData._id) {
+      setDialogOpen(true);
       return;
     }
 
@@ -97,7 +96,6 @@ export default function ResourcesCards() {
 
       const data = await response.json();
       alert(data.message);
-      // Filter out the deleted resource
       setResources((prev) => prev.filter((r) => r._id !== resource._id));
     } catch (error) {
       console.error("Error deleting resource:", error);
@@ -106,7 +104,7 @@ export default function ResourcesCards() {
   };
 
   const handleCloseDialog = () => {
-    setDialogOpen(false); // Close the dialog
+    setDialogOpen(false);
   };
 
   useEffect(() => {
@@ -118,12 +116,13 @@ export default function ResourcesCards() {
         }
         const resourcesData = await response.json();
 
-        const user_data = await AuthService.getUserData(
-          localStorage.getItem("token")
-        );
+        const token = localStorage.getItem("token");
+        if (token) {
+          const user_data = await AuthService.getUserData(token);
+          setUserData(user_data);
+        }
 
         setResources(resourcesData);
-        setUserData(user_data);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -177,20 +176,24 @@ export default function ResourcesCards() {
                     >
                       View
                     </Button>
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      onClick={() => handleSave(resource)}
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDelete(resource)}
-                    >
-                      Delete
-                    </Button>
+                    {userData && (
+                      <>
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          onClick={() => handleSave(resource)}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleDelete(resource)}
+                        >
+                          Delete
+                        </Button>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </Paper>

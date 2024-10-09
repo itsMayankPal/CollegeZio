@@ -24,6 +24,7 @@ export default function FilterSection() {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [userData, setUserData] = useState(null);
   const [selectedUniversity, setSelectedUniversity] = useState("");
+  // eslint-disable-next-line
   const [error, setError] = useState(null);
   const [selectedSemester, setSelectedSemester] = useState("");
   const [filteredResources, setFilteredResources] = useState([]);
@@ -48,7 +49,7 @@ export default function FilterSection() {
         setLoading(false);
       } catch (error) {
         console.error(error);
-        setError("Failed to load resources or user data.");
+        // setError("Failed to load resources or user data.");
         setLoading(false);
       }
     };

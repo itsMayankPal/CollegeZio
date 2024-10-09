@@ -4,20 +4,26 @@ import {
   Card,
   CardContent,
   Typography,
-  Button,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  TextField,
+  Button,
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
 } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useAuth } from "../Context/AuthContext"; // Uncomment and use this
+import { useAuth } from "../Context/AuthContext"; // Adjust the import path as necessary
+import { universities, courses } from "../Utils/Constant"; // Adjust the path if necessary
 
 export default function SavedResources() {
   const [openDialog, setOpenDialog] = useState(false);
@@ -26,13 +32,16 @@ export default function SavedResources() {
     description: "",
     type: "",
     link: "",
-    academicYear: "",
+    university: "",
     course: [],
+    semester: "",
+    subject: "",
   });
-
   const [resources, setResources] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
   const { user } = useAuth(); // Getting user data from context
 
+  // Fetch saved resources
   useEffect(() => {
     const fetchResources = async () => {
       const response = await fetch(
@@ -54,34 +63,62 @@ export default function SavedResources() {
     fetchResources();
   }, []);
 
+  // Open dialog for adding new resource
   const handleOpenDialog = () => {
     setCurrentResource({
       title: "",
       description: "",
       type: "",
       link: "",
-      academicYear: "",
+      university: "",
       course: [],
+      semester: "",
+      subject: "",
     });
     setOpenDialog(true);
   };
 
+  // Close dialog
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
 
-  const handleSave = async () => {
+  // Handle input change
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentResource((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  // Handle save action
+  const handleSaveResource = async () => {
+    // Check for missing fields
+    if (
+      !currentResource.title ||
+      !currentResource.type ||
+      !currentResource.link ||
+      !currentResource.university ||
+      !currentResource.course.length ||
+      !currentResource.semester ||
+      !currentResource.subject
+    ) {
+      setErrorMessage("All fields are required.");
+      return; // Early return to prevent submission
+    }
+
     if (!user._id) {
       alert("You need to log in to save resources.");
       return;
     }
-    console.log("Handle save is running");
+
     const userConfirmed = window.confirm(
       "Are you sure you want to save this resource?"
     );
+
     if (userConfirmed) {
       try {
-        console.log("User Confirmed to Add Resource");
         const response = await fetch(
           "http://localhost:3002/api/resources/add",
           {
@@ -90,14 +127,7 @@ export default function SavedResources() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
-            body: JSON.stringify({
-              type: currentResource.type,
-              title: currentResource.title,
-              link: currentResource.link,
-              description: currentResource.description,
-              academicYear: currentResource.academicYear,
-              course: currentResource.course,
-            }),
+            body: JSON.stringify(currentResource),
           }
         );
 
@@ -106,9 +136,9 @@ export default function SavedResources() {
         }
 
         const data = await response.json();
-        alert(data);
         setResources((prev) => [...prev, data]); // Add the new resource to state
         setOpenDialog(false);
+        alert("Resource saved successfully!");
       } catch (error) {
         console.error(error);
         alert("Error saving resource: " + error.message);
@@ -116,6 +146,7 @@ export default function SavedResources() {
     }
   };
 
+  // Handle resource deletion
   const handleDelete = async (resourceId) => {
     try {
       const response = await fetch(
@@ -131,7 +162,6 @@ export default function SavedResources() {
       const result = await response.json();
       if (response.ok) {
         setResources((prev) => prev.filter((res) => res._id !== resourceId));
-        console.log(result.message);
         alert(result.message); // Feedback on successful deletion
       } else {
         alert("Error deleting resource: " + result.message);
@@ -188,100 +218,135 @@ export default function SavedResources() {
         </Button>
       </Grid>
 
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Add New Resource</DialogTitle>
         <DialogContent>
+          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+
           <TextField
             autoFocus
             margin="dense"
             label="Title"
+            name="title"
             type="text"
             fullWidth
             variant="outlined"
             value={currentResource.title}
-            onChange={(e) =>
-              setCurrentResource({ ...currentResource, title: e.target.value })
-            }
+            onChange={handleInputChange}
+            required
           />
+
           <TextField
             margin="dense"
             label="Description"
+            name="description"
             type="text"
             fullWidth
             variant="outlined"
             value={currentResource.description}
-            onChange={(e) =>
-              setCurrentResource({
-                ...currentResource,
-                description: e.target.value,
-              })
-            }
+            onChange={handleInputChange}
+            required
           />
-          <TextField
-            margin="dense"
-            label="Type"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={currentResource.type}
-            onChange={(e) =>
-              setCurrentResource({
-                ...currentResource,
-                type: e.target.value,
-              })
-            }
-          />
+
+          <FormControl fullWidth required variant="outlined" margin="dense">
+            <InputLabel>Type</InputLabel>
+            <Select
+              name="type"
+              value={currentResource.type || ""}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="Notes">Notes</MenuItem>
+              <MenuItem value="PYQs">PYQs</MenuItem>
+              <MenuItem value="YouTube Video">YouTube Video</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
             margin="dense"
             label="Link"
+            name="link"
             type="text"
             fullWidth
             variant="outlined"
             value={currentResource.link}
-            onChange={(e) =>
-              setCurrentResource({
-                ...currentResource,
-                link: e.target.value,
-              })
-            }
+            onChange={handleInputChange}
+            required
           />
+
+          <FormControl fullWidth required variant="outlined" margin="dense">
+            <InputLabel>University</InputLabel>
+            <Select
+              name="university"
+              value={currentResource.university || ""}
+              onChange={handleInputChange}
+            >
+              {universities.map((uni, index) => (
+                <MenuItem key={index} value={uni}>
+                  {uni}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth required variant="outlined" margin="dense">
+            <InputLabel>Semester</InputLabel>
+            <Select
+              name="semester"
+              value={currentResource.semester || ""}
+              onChange={handleInputChange}
+            >
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                <MenuItem key={sem} value={sem}>
+                  {sem}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth required variant="outlined" margin="dense">
+            <InputLabel>Course</InputLabel>
+            <Select
+              name="course"
+              multiple
+              value={currentResource.course}
+              onChange={(e) =>
+                setCurrentResource({
+                  ...currentResource,
+                  course: e.target.value,
+                })
+              }
+            >
+              {courses.map((course, index) => (
+                <MenuItem key={index} value={course}>
+                  {course}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             margin="dense"
-            label="Academic Year"
+            label="Subject"
+            name="subject"
             type="text"
             fullWidth
             variant="outlined"
-            value={currentResource.academicYear}
-            onChange={(e) =>
-              setCurrentResource({
-                ...currentResource,
-                academicYear: e.target.value,
-              })
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Course"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={currentResource.course.join(", ")} // Assuming it's an array of strings
-            onChange={(e) =>
-              setCurrentResource({
-                ...currentResource,
-                course: e.target.value
-                  .split(",")
-                  .map((course) => course.trim()), // Convert back to array
-              })
-            }
+            value={currentResource.subject}
+            onChange={handleInputChange}
+            required
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleSave} color="primary">
-            Save
+          <Button onClick={handleSaveResource} color="primary">
+            Save Resource
           </Button>
         </DialogActions>
       </Dialog>

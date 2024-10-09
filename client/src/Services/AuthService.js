@@ -7,6 +7,7 @@ const API_URL = "http://localhost:3002/api/users/";
 const register = async (userData) => {
   try {
     const response = await axios.post(`${API_URL}register`, userData);
+    console.log("authservice===", userData);
     return response.data; // Make sure the response has the expected structure
   } catch (error) {
     throw new Error(error.response?.data?.message || "Registration failed.");

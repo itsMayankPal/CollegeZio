@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../Assets/images/logo.png";
 import {
   AppBar,
@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useState } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
@@ -21,22 +20,51 @@ export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
+  // State variable to manage login status
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Function to check login status
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem("authToken");
+    console.log("Checking login status... Token:", !token); // Debugging
+    const flag = !token;
+    setIsLoggedIn(flag); // Set true if token exists
+  };
+
+  // Check if the token exists in local storage on mount
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
+  };
+
+  const logoutUser = () => {
+    localStorage.removeItem("token"); // Remove the token
+    console.log("User logged out, token removed."); // Debugging
+    setIsLoggedIn(false); // Update the state to logged out
   };
 
   const menuItems = [
     { text: "Home", path: "/" },
     { text: "About", path: "/about" },
-    { text: "Contact", path: "/contact" },
-    { text: "Courses", path: "/courses" },
     { text: "Dashboard", path: "/dashboard" },
-    { text: "Mock Test", path: "/mock-test" },
-    { text: "Profile", path: "/profile" },
+    { text: "Insights", path: "/insights" },
     { text: "Resources", path: "/resources" },
-    { text: "Login", path: "/login" },
-    { text: "Register", path: "/register" },
   ];
+
+  // Conditionally add "Login" and "Register" to the menu items based on login status
+  if (!isLoggedIn) {
+    menuItems.push(
+      { text: "Login", path: "/login" },
+      { text: "Register", path: "/register" }
+    );
+  } else {
+    menuItems.push(
+      { text: "Logout", path: "/", action: logoutUser } // Add logout option
+    );
+  }
 
   return (
     <>
@@ -57,8 +85,6 @@ export default function Header() {
         >
           <div className="logo">
             <Link to="/">
-              {" "}
-              {/* Wrap the logo with Link to navigate to home */}
               <img
                 src={logo}
                 alt="CollegeZio Logo"
@@ -90,7 +116,10 @@ export default function Header() {
                       component={Link}
                       to={item.path}
                       key={item.text}
-                      onClick={handleDrawerToggle}
+                      onClick={() => {
+                        if (item.action) item.action(); // Call logout if defined
+                        handleDrawerToggle();
+                      }}
                     >
                       <ListItemText primary={item.text} />
                     </ListItem>
@@ -105,6 +134,7 @@ export default function Header() {
                   key={item.text}
                   component={Link}
                   to={item.path}
+                  onClick={item.action} // Call logout if defined
                   sx={{
                     color: "#FFD700",
                     fontWeight: "bold",

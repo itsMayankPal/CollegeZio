@@ -8,6 +8,7 @@ dotenv.config();
 // Import routes
 const userRoutes = require("./routes/userRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
+const insightRoutes = require("./routes/insightsRoutes");
 
 connectDB();
 
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 // Use routes
 app.use("/api/users", userRoutes);
 app.use("/api/resources", resourceRoutes);
+app.use("/api/insights", insightRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;

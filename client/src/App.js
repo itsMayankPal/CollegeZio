@@ -13,7 +13,7 @@ import Dashboard from "./Pages/Dashboard";
 import MockTest from "./Pages/MockTest";
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
-import Profile from "./Pages/Profile";
+import Insights from "./Pages/Insights";
 import NotFound from "./Components/NotFound.jsx";
 import PrivateRoute from "./Services/PrivateRoute"; // Import PrivateRoute
 import Resources from "./Pages/Resources";
@@ -64,7 +64,7 @@ const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "resources", element: <Resources /> },
       { path: "mock-test", element: <MockTest /> },
-      { path: "profile", element: <PrivateRoute element={<Profile />} /> }, // Protected route
+      { path: "insights", element: <Insights /> },
       { path: "privacy", element: <Privacy /> },
       { path: "*", element: <NotFound /> }, // Fallback for 404
     ],
